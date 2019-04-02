@@ -1,8 +1,8 @@
 <template>
  <v-container>
-   <v-layout column>
-     <v-flex row>
-       <span v-for="word in arr" class="words" style="width: fit-content"  v-if="word.visible">
+   <v-layout column align-center>
+     <v-flex row :class="{'selectedText':selected}" >
+       <span v-for="word in arr" class="words" v-if="word.visible">
        <template v-if="word.word === ' '">
          &nbsp
        </template>
@@ -13,10 +13,7 @@
        <span class="pipe" v-bind:style="pipe? 'visibility:visible' : 'visibility:hidden'">   |</span>
      </v-flex>
      <v-flex style="margin-top: 40px">
-       <v-btn @click="destroyText(`< Soy el typer />`)" >Agree</v-btn>
-     </v-flex>
-     <v-flex>
-       <v-btn @click="cambio()">Cambio</v-btn>
+       <v-btn @click="start()">Cambio</v-btn>
      </v-flex>
    </v-layout>
  </v-container>
@@ -29,10 +26,13 @@
     props:['text'],
     data:function(){
       return{
+        selected:false,
         textToReady:'asdas',
         arr:[],
         pipe:true,
         pipeBlink:false,
+        timesBlinks:5*2, //5 de fuera, *2 porque se cuenta el de oculto igual.
+        timesSelected:3*2, //igual
         pos:0
       }
     }
@@ -48,28 +48,28 @@
             finalArr =  finalArr.concat(word.split(''))
           }
         })
-        console.log("soy el array ",finalArr)
         this.arr = finalArr.map((word) => ({word:word, visible:false}))
       },
       cambio:function(){
-        setInterval(() =>{
+        var blinks = 0
+        var writeAction = setInterval(() =>{
           if(this.pos !== this.arr.length){
             this.arr[this.pos].visible = true
             this.pos = this.pos + 1
           }else{
-            this.blink(true)
+            blinks++
+            this.selected = blinks > this.timesBlinks
+            this.pipe = !this.pipe
+            if(blinks > this.timesSelected + this.timesBlinks){
+              clearInterval(writeAction)
+              //Iniciar denuevo.
+            }
           }
         },300)
       },
-      blink:function(opt){
-        if(opt){
-          let interval = setInterval(()=>{
-            this.pipe = !this.pipe
-            !this.pipeBlink? clearInterval(interval):null
-          },1000)
-        }else{
-
-        }
+      start:function(){
+        this.destroyText(` Hola soy el typer `)
+        this.cambio()
       }
     },
   }
@@ -77,9 +77,16 @@
 
 <style>
 .words{
-  font-size: large;
+  font-size: 35px;
 }
 .pipe{
-  font-size: large;
+  font-size: 35px;
+}
+.halfSelected{
+  width: 50%;
+}
+.selectedText{
+  background-color: #707070;
+  color: azure;
 }
 </style>

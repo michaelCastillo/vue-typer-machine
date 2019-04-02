@@ -5,9 +5,6 @@
         <v-flex style="margin-top: 100px">
           <TyperAnimation/>
         </v-flex>
-        <v-flex>
-          <v-btn style="margin-top: 100px" color="error">Error</v-btn>
-        </v-flex>
       </v-layout>
     </v-container>
   </v-app>
