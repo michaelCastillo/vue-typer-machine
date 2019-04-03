@@ -73,7 +73,7 @@
         },this.writeSpeed)
       },
       start:function(){
-        this.destroyText(['El','Rusio','Se','la','come'])
+        this.destroyText(['typer','machine'])
         this.actualText = this.arr[this.textIndex]
         console.log("actual ",this.actualText)
         var waitTime = this.writeSpeed*(this.actualText.length+this.timesSelected + this.timesBlinks)
