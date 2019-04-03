@@ -2,7 +2,7 @@
  <v-container>
    <v-layout column align-center>
      <v-flex row :class="{'selectedText':selected}" >
-       <span v-for="word in arr" class="words" v-if="word.visible">
+       <span v-for="word in actualText" class="words" v-if="word.visible">
        <template v-if="word.word === ' '">
          &nbsp
        </template>
@@ -27,49 +27,68 @@
     data:function(){
       return{
         selected:false,
-        textToReady:'asdas',
+        actualText:[],
         arr:[],
         pipe:true,
         pipeBlink:false,
-        timesBlinks:5*2, //5 de fuera, *2 porque se cuenta el de oculto igual.
-        timesSelected:3*2, //igual
-        pos:0
+        timesBlinks:4*2, //5 de fuera, *2 porque se cuenta el de oculto igual.
+        timesSelected:2*2, //igual
+        writeSpeed:100,
+        textIndex:0,
       }
     }
     ,
     methods:{
-      destroyText:function(textIn){
-        let wordsArr = textIn.split(/(\s)/)
-        let finalArr = []
-        wordsArr.map((word) =>{
-          if(word === ' '){
-            finalArr.push(' ')
-          }else{
-            finalArr =  finalArr.concat(word.split(''))
-          }
+      destroyText:function(texts){
+        this.arr = texts.map((a_text)=>{
+          let wordsArr = a_text.split(/(\s)/)
+          let finalArr = []
+          wordsArr.map((word) =>{
+            if(word === ' '){
+              finalArr.push(' ')
+            }else{
+              finalArr =  finalArr.concat(word.split(''))
+            }
+
+          })
+          return finalArr.map((word) => ({word:word, visible:false}))
         })
-        this.arr = finalArr.map((word) => ({word:word, visible:false}))
+
       },
       cambio:function(){
         var blinks = 0
+        var pos = 0
         var writeAction = setInterval(() =>{
-          if(this.pos !== this.arr.length){
-            this.arr[this.pos].visible = true
-            this.pos = this.pos + 1
+          if(pos !== this.actualText.length){
+            this.actualText[pos].visible = true
+            pos = pos + 1
           }else{
             blinks++
             this.selected = blinks > this.timesBlinks
             this.pipe = !this.pipe
             if(blinks > this.timesSelected + this.timesBlinks){
               clearInterval(writeAction)
-              //Iniciar denuevo.
             }
           }
-        },300)
+        },this.writeSpeed)
       },
       start:function(){
-        this.destroyText(` Hola soy el typer `)
+        this.destroyText(['El','Rusio','Se','la','come'])
+        this.actualText = this.arr[this.textIndex]
+        console.log("actual ",this.actualText)
+        var waitTime = this.writeSpeed*(this.actualText.length+this.timesSelected + this.timesBlinks)
         this.cambio()
+        setTimeout(()=>{
+          this.clearTyper()
+          this.textIndex = this.textIndex === (this.arr.length - 1 )? 0 : this.textIndex + 1
+          this.start()
+        },waitTime + 200)
+
+      },
+      clearTyper(){
+        this.actualText = []
+        this.selected = false
+        this.pipe = true
       }
     },
   }
